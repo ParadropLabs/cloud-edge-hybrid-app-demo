@@ -8,6 +8,6 @@ module.exports = {
   },
   consumer: {
     protocol: "http",
-    host: "localhost:5000"
+    host: "localhost:3002"
   }
 };

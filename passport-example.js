@@ -7,8 +7,8 @@ var util = require('util'),
 
 function Strategy(options, verify) {
   options = options || {};
-  options.authorizationURL = options.authorizationURL || (pConf.protocol + '://' + pConf.host + '/dialog/authorize');
-  options.tokenURL = options.tokenURL || (pConf.protocol + '://' + pConf.host + '/oauth/token');
+  options.authorizationURL = pConf.protocol + '://' + pConf.host + '/dialog/authorize';
+  options.tokenURL = pConf.protocol + '://' + pConf.host + '/token';
 
   OAuth2Strategy.call(this, options, verify);
   this.name = 'example-oauth2orize';

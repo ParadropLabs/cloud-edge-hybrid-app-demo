@@ -4,7 +4,7 @@ var connect = require('connect'),
   path = require('path'),
   passport = require('passport'),
   User = require('./user'),
-  ExampleStrategy = require('./passport-example/strategy').Strategy,
+  ExampleStrategy = require('./passport-example').Strategy,
   app = connect(),
   server, port = process.argv[2] || 3002,
   oauthConfig = require('./oauth-config'),
@@ -62,8 +62,8 @@ function route(rest) {
   });
 
 
-  rest.get('/auth/example-oauth2orize', passport.authenticate('exampleauth', { scope: ['edit-routers', 'edit-chutes'] }));
-  rest.get('/auth/example-oauth2orize/callback', passport.authenticate('exampleauth', { failureRedirect: '/close.html?error=foo' }));
+  rest.get('/auth/example-oauth2orize', passport.authenticate('example-oauth2orize', { scope: ['edit-routers', 'edit-chutes'] }));
+  rest.get('/auth/example-oauth2orize/callback', passport.authenticate('example-oauth2orize', { failureRedirect: '/close.html?error=foo' }));
 
   rest.get('/auth/example-oauth2orize/callback', function(req, res) {
     console.log('req.session');

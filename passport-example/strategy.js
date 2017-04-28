@@ -1,15 +1,9 @@
 'use strict';
 
-/**
- * Module dependencies.
- */
 var util = require('util'),
   OAuth2Strategy = require('passport-oauth').OAuth2Strategy,
   InternalOAuthError = require('passport-oauth').InternalOAuthError,
-  parse = require('./profile').parse
-  // XXX note that this should have its own config,
-  // but for simplicity I'm using the main one, one directory up
-  ,
+  parse = require('./profile').parse,
   pConf = require('../oauth-config').provider;
 
 /**
@@ -50,24 +44,13 @@ function Strategy(options, verify) {
   var me = this;
 
   options = options || {};
-  options.authorizationURL =
-    options.authorizationURL ||
-    options.authorizationUrl ||
-    (pConf.protocol + '://' + pConf.host + '/dialog/authorize');
-  options.tokenURL =
-    options.tokenURL ||
-    options.tokenUrl ||
-    (pConf.protocol + '://' + pConf.host + '/oauth/token');
-
+  options.authorizationURL = pConf.protocol + '://' + pConf.host + '/dialog/authorize';
+  options.tokenURL = pConf.protocol + '://' + pConf.host + '/token';
   OAuth2Strategy.call(me, options, verify);
 
-  // must be called after prototype is modified
   me.name = 'exampleauth';
 }
 
-/**
- * Inherit from `OAuth2Strategy`.
- */
 util.inherits(Strategy, OAuth2Strategy);
 
 
