@@ -33,4 +33,4 @@ Edit `./example-oauth2orize-consumer.js` to point to your desired oauth2 provide
 
     node ./server 3001
 
-Then visit <http://localhost:3001> and play around.
+http://localhost:3002/auth/example-oauth2orize

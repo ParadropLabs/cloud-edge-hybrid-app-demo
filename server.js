@@ -12,29 +12,10 @@ var connect = require('connect'),
   lConf = oauthConfig.consumer,
   opts = require('./oauth-consumer-config');
 
-var conf = {
-  provider: {
-    protocol: "http",
-    host: "localhost:3000",
-    profileUrl: "/api/userinfo"
-  },
-  consumer: {
-    protocol: "http",
-    host: "localhost:5000"
-  }
-};
-
 if (!connect.router) {
   connect.router = require('connect_router');
 }
 
-// Passport session setup.
-//   To support persistent login sessions, Passport needs to be able to
-//   serialize users into and deserialize users out of the session.  Typically,
-//   this will be as simple as storing the user ID when serializing, and finding
-//   the user by ID when deserializing.  However, since this example does not
-//   have a database of user records, the complete Facebook profile is serialized
-//   and deserialized.
 passport.serializeUser(function(user, done) {
   //Users.create(user);
   done(null, user);
@@ -42,7 +23,6 @@ passport.serializeUser(function(user, done) {
 
 passport.deserializeUser(function(obj, done) {
   var user = obj;
-
   done(null, user);
 });
 
@@ -82,7 +62,7 @@ function route(rest) {
   });
 
 
-  rest.get('/auth/example-oauth2orize', passport.authenticate('exampleauth', { scope: ['email'] }));
+  rest.get('/auth/example-oauth2orize', passport.authenticate('exampleauth', { scope: ['edit-routers', 'edit-chutes'] }));
   rest.get('/auth/example-oauth2orize/callback', passport.authenticate('exampleauth', { failureRedirect: '/close.html?error=foo' }));
 
   rest.get('/auth/example-oauth2orize/callback', function(req, res) {
@@ -111,8 +91,7 @@ function route(rest) {
   });
 }
 
-app
-  .use(connect.query())
+app.use(connect.query())
   .use(connect.json())
   .use(connect.urlencoded())
   .use(connect.compress())
