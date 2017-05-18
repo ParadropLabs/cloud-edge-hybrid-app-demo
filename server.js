@@ -38,6 +38,10 @@ passport.use(new ExampleStrategy({
 }));
 
 function route(rest) {
+  rest.get('/', function(req, res) {
+    res.render('index.jade')
+  })
+
   rest.get('/externalapi/account', function(req, res, next) {
     console.log('[using accessToken]', req.user.accessToken);
 
