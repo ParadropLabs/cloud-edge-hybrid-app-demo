@@ -40,14 +40,11 @@ var util = require('util'),
  * @api public
  */
 function Strategy(options, verify) {
-  var me = this;
-
   options = options || {};
   options.authorizationURL = pConf.protocol + '://' + pConf.host + '/dialog/authorize';
   options.tokenURL = pConf.protocol + '://' + pConf.host + '/token';
-  OAuth2Strategy.call(me, options, verify);
-
-  me.name = 'exampleauth';
+  OAuth2Strategy.call(this, options, verify);
+  this.name = 'exampleauth';
 }
 
 util.inherits(Strategy, OAuth2Strategy);
@@ -67,9 +64,12 @@ util.inherits(Strategy, OAuth2Strategy);
  * @param {Function} done
  * @api protected
  */
+// Damouse's notes: oauth2orize *always* calls this function. The user may override it,
+// 
 Strategy.prototype.userProfile = function(accessToken, done) {
   var me = this;
   console.log("Access token completeddd")
+  done(null, null)
   return
 
   me._oauth2.get(

@@ -3,9 +3,6 @@
   "version": "0.1.0",
   "description": "A Tool for YSA wards to track home and visiting teaching",
   "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": "",
   "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.com)",
   "license": "Apache2",

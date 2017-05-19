@@ -5,6 +5,7 @@ var connect = require('connect'),
   passport = require('passport'),
   User = require('./user'),
   ExampleStrategy = require('./passport-sample').Strategy,
+  OAuth2Strategy = require('passport-oauth').OAuth2Strategy,
   oauthConfig = require('./oauth-config'),
   express = require('express'),
   opts = require('./oauth-consumer-config'),
@@ -15,7 +16,6 @@ var port = process.argv[2] || 3002;
 
 // Passport Functions
 passport.serializeUser(function(user, done) {
-  //Users.create(user);
   done(null, user);
 });
 
@@ -24,15 +24,19 @@ passport.deserializeUser(function(obj, done) {
   done(null, user);
 });
 
-passport.use(new ExampleStrategy({
+passport.use('exampleauth', new OAuth2Strategy({
   clientID: opts.clientId,
   clientSecret: opts.clientSecret,
+  authorizationURL: oauthConfig.provider.protocol + '://' + oauthConfig.provider.host + '/dialog/authorize',
+  tokenURL: oauthConfig.provider.protocol + '://' + oauthConfig.provider.host + '/token',
   callbackURL: oauthConfig.consumer.protocol + "://" + oauthConfig.consumer.host + "/auth/example-oauth2orize/callback"
 }, function(accessToken, refreshToken, profile, done) {
-  User.findOrCreate({ profile: profile }, function(err, user) {
-    user.accessToken = accessToken;
-    return done(err, user);
-  });
+  console.log("Why do you call the profile callback?");
+  done(null, null);
+  // User.findOrCreate({ profile: profile }, function(err, user) {
+  //   user.accessToken = accessToken;
+  //   return done(err, user);
+  // });
 }));
 
 // Routing
