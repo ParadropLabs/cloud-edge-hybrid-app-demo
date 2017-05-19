@@ -1,15 +1,17 @@
 'use strict';
 
-var path = require('path'),
+var connect = require('connect'),
+  path = require('path'),
   passport = require('passport'),
   User = require('./user'),
-  ExampleStrategy = require('./passport-example/strategy').Strategy,
+  ExampleStrategy = require('./passport-sample').Strategy,
   oauthConfig = require('./oauth-config'),
   express = require('express'),
-  opts = require('./oauth-consumer-config');
+  opts = require('./oauth-consumer-config'),
+  path = require('path');
 
 var app = express();
-var server, port = process.argv[2] || 3002;
+var port = process.argv[2] || 3002;
 
 // Passport Functions
 passport.serializeUser(function(user, done) {
@@ -34,10 +36,8 @@ passport.use(new ExampleStrategy({
 }));
 
 // Routing
-// function route(rest) {
 app.get('/', function(req, res, next) {
-  // console.log(res)
-  res.render('index.jade');
+  res.sendFile(path.resolve('public/index.html'));
 });
 
 app.get('/externalapi/account', function(req, res, next) {
@@ -70,7 +70,7 @@ app.get('/auth/example-oauth2orize/callback', passport.authenticate('exampleauth
 app.get('/auth/example-oauth2orize/callback', function(req, res) {
   console.log('req.session');
   console.log(req.session);
-  var url = '/success.html' // + '?type=fb'
+  var url = '/success.html'
     /*
     + '&accessToken=' + req.session.passport.user.accessToken
     + '&email=' + req.session.passport.user.profile.email
@@ -88,12 +88,12 @@ app.get('/auth/example-oauth2orize/callback', function(req, res) {
 });
 
 app.post('/auth/example-oauth2orize/callback', function(req, res /*, next*/ ) {
+  console.log("Moved to passport?")
   console.log('req.user', req.user);
   res.end('thanks for playing');
 });
-// }
 
-
+// Server Setup
 app.use(connect.query())
   .use(connect.json())
   .use(connect.urlencoded())
@@ -101,14 +101,9 @@ app.use(connect.query())
   .use(connect.cookieParser())
   .use(connect.session({ secret: 'keyboard mouse' }))
   .use(passport.initialize())
-  .use(passport.session())
-  // .use(connect.router(route))
-  .use(connect.static(path.join(__dirname, 'public')));
+  .use(passport.session());
 
-module.exports = app;
 
-if (require.main === module) {
-  server = app.listen(port, function() {
-    console.log('Listening on', server.address());
-  });
-}
+var server = app.listen(port, function() {
+  console.log('Listening on', server.address());
+});

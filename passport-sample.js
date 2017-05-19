@@ -3,8 +3,7 @@
 var util = require('util'),
   OAuth2Strategy = require('passport-oauth').OAuth2Strategy,
   InternalOAuthError = require('passport-oauth').InternalOAuthError,
-  parse = require('./profile').parse,
-  pConf = require('../oauth-config').provider;
+  pConf = require('./oauth-config').provider;
 
 /**
  * `Strategy` constructor.
@@ -70,6 +69,8 @@ util.inherits(Strategy, OAuth2Strategy);
  */
 Strategy.prototype.userProfile = function(accessToken, done) {
   var me = this;
+  console.log("Access token completeddd")
+  return
 
   me._oauth2.get(
     pConf.protocol + '://' + pConf.host + pConf.profileUrl, accessToken,
@@ -99,8 +100,4 @@ Strategy.prototype.userProfile = function(accessToken, done) {
   );
 };
 
-
-/**
- * Expose `Strategy`.
- */
 module.exports.Strategy = Strategy.Strategy = Strategy;
