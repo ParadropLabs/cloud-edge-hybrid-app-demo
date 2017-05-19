@@ -1,18 +1,24 @@
 'use strict';
 
 var connect = require('connect'),
-  path = require('path'),
   passport = require('passport'),
-  User = require('./user'),
-  ExampleStrategy = require('./passport-sample').Strategy,
   OAuth2Strategy = require('passport-oauth').OAuth2Strategy,
-  oauthConfig = require('./oauth-config'),
   express = require('express'),
-  opts = require('./oauth-consumer-config'),
+  conf = require('./config'),
   path = require('path');
 
-var app = express();
 var port = process.argv[2] || 3002;
+
+var app = express()
+  .use(connect.query())
+  .use(connect.json())
+  .use(connect.urlencoded())
+  .use(connect.compress())
+  .use(connect.cookieParser())
+  .use(connect.session({ secret: 'keyboard mouse' }))
+  .use(passport.initialize())
+  .use(passport.session())
+
 
 // Passport Functions
 passport.serializeUser(function(user, done) {
@@ -25,14 +31,15 @@ passport.deserializeUser(function(obj, done) {
 });
 
 passport.use('exampleauth', new OAuth2Strategy({
-  clientID: opts.clientId,
-  clientSecret: opts.clientSecret,
-  authorizationURL: oauthConfig.provider.protocol + '://' + oauthConfig.provider.host + '/dialog/authorize',
-  tokenURL: oauthConfig.provider.protocol + '://' + oauthConfig.provider.host + '/token',
-  callbackURL: oauthConfig.consumer.protocol + "://" + oauthConfig.consumer.host + "/auth/example-oauth2orize/callback"
+  clientID: conf.consumer.clientId,
+  clientSecret: conf.consumer.clientSecret,
+  authorizationURL: conf.provider.url + '/dialog/authorize',
+  tokenURL: conf.provider.url + '/token',
+  callbackURL: conf.consumer.url + "/auth/example-oauth2orize/callback"
 }, function(accessToken, refreshToken, profile, done) {
   console.log("Why do you call the profile callback?");
-  done(null, null);
+  done(null, profile);
+
   // User.findOrCreate({ profile: profile }, function(err, user) {
   //   user.accessToken = accessToken;
   //   return done(err, user);
@@ -50,7 +57,7 @@ app.get('/externalapi/account', function(req, res, next) {
   if (false) { next(); }
   var request = require('request'),
     options = {
-      url: oauthConfig.provider.protocol + '://' + oauthConfig.provider.host + '/api/exampleauth/me',
+      url: conf.provider.url + '/api/exampleauth/me',
       headers: {
         'Authorization': 'Bearer ' + req.user.accessToken
       }
@@ -74,21 +81,22 @@ app.get('/auth/example-oauth2orize/callback', passport.authenticate('exampleauth
 app.get('/auth/example-oauth2orize/callback', function(req, res) {
   console.log('req.session');
   console.log(req.session);
-  var url = '/success.html'
-    /*
-    + '&accessToken=' + req.session.passport.user.accessToken
-    + '&email=' + req.session.passport.user.profile.email
-    + '&link=' + req.session.passport.user.profile.profileUrl
-    */
-  ;
 
-  console.log(url);
-  res.statusCode = 302;
-  res.setHeader('Location', url);
-  res.end('hello');
+  // var url = 'public/success.html'
+  //   + '&accessToken=' + req.session.passport.user.accessToken
+  //   + '&email=' + req.session.passport.user.profile.email
+  //   + '&link=' + req.session.passport.user.profile.profileUrl
+  // ;
+
+  // console.log(url);
+  // res.statusCode = 302;
+  // res.setHeader('Location', url);
+  // res.end('hello');
   // This will pass through to the static module
   //req.url = url;
   //next();
+
+  res.sendFile(path.resolve('public/success.html'));
 });
 
 app.post('/auth/example-oauth2orize/callback', function(req, res /*, next*/ ) {
@@ -98,16 +106,6 @@ app.post('/auth/example-oauth2orize/callback', function(req, res /*, next*/ ) {
 });
 
 // Server Setup
-app.use(connect.query())
-  .use(connect.json())
-  .use(connect.urlencoded())
-  .use(connect.compress())
-  .use(connect.cookieParser())
-  .use(connect.session({ secret: 'keyboard mouse' }))
-  .use(passport.initialize())
-  .use(passport.session());
-
-
 var server = app.listen(port, function() {
   console.log('Listening on', server.address());
 });
