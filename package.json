@@ -13,5 +13,6 @@
     "passport-http-bearer": "~1.0.1",
     "passport-ldsauth": "~0.9.0",
     "passport-oauth": "~1.0.0",
+    "request": "^2.81.0"
   }
 }

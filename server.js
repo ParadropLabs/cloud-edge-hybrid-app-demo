@@ -3,6 +3,7 @@
 var connect = require('connect'),
   passport = require('passport'),
   express = require('express'),
+  request = require('request'),
   conf = require('./config'),
   path = require('path'),
   OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
@@ -33,8 +34,8 @@ passport.deserializeUser(function(obj, done) {
 passport.use('exampleauth', new OAuth2Strategy({
   clientID: conf.consumer.clientId,
   clientSecret: conf.consumer.clientSecret,
-  authorizationURL: conf.provider.url + '/dialog/authorize',
-  tokenURL: conf.provider.url + '/token',
+  authorizationURL: conf.provider.url + conf.provider.authorization_route,
+  tokenURL: conf.provider.url + conf.provider.token_route,
   callbackURL: conf.consumer.url + "/auth/example-oauth2orize/callback"
 }, function(accessToken, refreshToken, profile, done) {
   done(null, { accessToken: accessToken });
@@ -46,27 +47,21 @@ app.get('/', function(req, res, next) {
 });
 
 app.get('/externalapi/account', function(req, res, next) {
-  var request = require('request'),
-    options = {
-      url: conf.provider.url + '/api/exampleauth/me',
-      headers: {
-        'Authorization': 'Bearer ' + req.user.accessToken
-      }
-    };
+  var options = {
+    url: conf.provider.url + '/api/routers',
+    headers: { 'Authorization': 'Bearer ' + req.user.accessToken }
+  };
 
-  function callback(error, response, body) {
+  request(options, function(error, response, body) {
     if (!error && response.statusCode === 200) {
       res.end(body);
     } else {
       res.end('error: \n' + body);
     }
-  }
-
-  request(options, callback);
+  });
 });
 
-
-app.get('/auth/example-oauth2orize', passport.authenticate('exampleauth', { scope: ['edit-routers', 'edit-chutes'] }));
+app.get('/auth/example-oauth2orize', passport.authenticate('exampleauth', { scope: ['list-routers'] }));
 app.get('/auth/example-oauth2orize/callback', passport.authenticate('exampleauth', { failureRedirect: '/close.html?error=foo' }));
 
 app.get('/auth/example-oauth2orize/callback', function(req, res) {
@@ -80,8 +75,9 @@ app.post('/auth/example-oauth2orize/callback', function(req, res /*, next*/ ) {
 });
 
 // Server Setup
-var port = process.argv[2] || 3002;
+// Retrieve the port from the configuration URL. Not clean, but this is not meant for production
+var split = conf.consumer.url.split(':')
+var port = split[split.length - 1]
 
-var server = app.listen(port, function() {
-  console.log('Listening on', server.address());
-});
+console.log("Demo consumer running at: ", conf.consumer.url);
+app.listen(port);
