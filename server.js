@@ -47,12 +47,11 @@ app.get('/', function(req, res, next) {
 });
 
 app.get('/externalapi/account', function(req, res, next) {
-  var options = {
+  console.log("Issuing request with token: ", req.user.accessToken)
+  request({
     url: conf.provider.url + '/api/routers',
-    headers: { 'Authorization': 'Bearer ' + req.user.accessToken }
-  };
-
-  request(options, function(error, response, body) {
+    headers: { 'Authorization': 'Bearer ' + req.user.accessToken, 'X-pd-extension': 'extension' }
+  }, function(error, response, body) {
     if (!error && response.statusCode === 200) {
       res.end(body);
     } else {
@@ -68,11 +67,11 @@ app.get('/auth/example-oauth2orize/callback', function(req, res) {
   res.sendFile(path.resolve('public/success.html'));
 });
 
-app.post('/auth/example-oauth2orize/callback', function(req, res /*, next*/ ) {
-  console.log("Moved to passport?")
-  console.log('req.user', req.user);
-  res.end('thanks for playing');
-});
+// app.post('/auth/example-oauth2orize/callback', function(req, res /*, next*/ ) {
+//   console.log("Moved to passport?")
+//   console.log('req.user', req.user);
+//   res.end('thanks for playing');
+// });
 
 // Server Setup
 // Retrieve the port from the configuration URL. Not clean, but this is not meant for production
