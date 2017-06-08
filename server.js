@@ -3,9 +3,8 @@ var connect = require('connect'),
   express = require('express'),
   request = require('request'),
   conf = require('./config'),
-  handlebars = require('handlebars'),
-  exphbs = require('express-handlebars'),
-  OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
+  express_handlebars = require('express-handlebars'),
+  OAuth2Strategy = require('passport-oauth').OAuth2Strategy
 
 // Setup the app
 var app = express()
@@ -16,20 +15,15 @@ var app = express()
   .use(connect.cookieParser())
   .use(connect.session({ secret: 'keyboard mouse' }))
   .use(passport.initialize())
-  .use(passport.session());
+  .use(passport.session())
 
-app.engine('html', exphbs({ extname: '.html' }));
-app.set('view engine', 'html');
+// Use handlebars to template
+app.engine('html', express_handlebars({ extname: '.html' }))
+app.set('view engine', 'html')
 
 // Serializing a user object into the session
-passport.serializeUser(function(user, done) {
-  done(null, user);
-});
-
-passport.deserializeUser(function(obj, done) {
-  var user = obj;
-  done(null, user);
-});
+passport.serializeUser((user, done) => done(null, user))
+passport.deserializeUser((obj, done) => done(null, obj))
 
 passport.use('exampleauth', new OAuth2Strategy({
   clientID: conf.consumer.clientId,
@@ -37,43 +31,79 @@ passport.use('exampleauth', new OAuth2Strategy({
   authorizationURL: conf.provider.url + conf.provider.authorization_route,
   tokenURL: conf.provider.url + conf.provider.token_route,
   callbackURL: conf.consumer.url + "/auth/example-oauth2orize/callback"
-}, function(accessToken, refreshToken, profile, done) {
-  done(null, { accessToken: accessToken });
-}));
+}, (accessToken, refreshToken, profile, done) => {
+  done(null, { accessToken: accessToken })
+}))
 
 // Routing
-app.get('/', function(req, res, next) { res.render('index'); });
-app.get('/error', function(req, res, next) { res.render('error'); });
-app.get('/template', function(req, res, next) { res.render('templ', { test: "hello!" }) });
-app.get('/auth/example-oauth2orize/callback', function(req, res) { res.render('authed'); });
+app.get('/auth/example-oauth2orize', passport.authenticate('exampleauth', { scope: ['list-routers'] }))
+app.get('/auth/example-oauth2orize/callback', passport.authenticate('exampleauth', { failureRedirect: '/error?error=foo' }))
 
-app.get('/auth/example-oauth2orize', passport.authenticate('exampleauth', { scope: ['list-routers'] }));
-app.get('/auth/example-oauth2orize/callback', passport.authenticate('exampleauth', { failureRedirect: '/error?error=foo' }));
+app.get('/', (req, res, next) => res.render('index'))
+app.get('/error', (req, res, next) => res.render('error'))
+app.get('/auth/example-oauth2orize/callback', (req, res) => res.render('authed'))
 
-app.get('/externalapi/account', function(req, res, next) {
-  console.log(req.user)
+app.get('/choose-router', (req, res, next) => {
   request({
     url: conf.provider.url + '/api/routers',
-    headers: { 'Authorization': 'Bearer ' + req.user.accessToken, 'X-pd-extension': 'extension' }
-  }, function(error, response, body) {
-    console.log("Where the hell are we? ")
-
-    if (!error && response.statusCode === 200) {
-      // res.end(body);
-      console.log("BODY")
-      cosole.log("Body: ", body)
-      res.render('routers', { routers: body });
-    } else {
-      console.log("body?")
-      res.end('error: \n' + body);
+    headers: {
+      'Authorization': 'Bearer ' + req.user.accessToken,
+      'X-pd-extension': 'extension'
     }
-  });
-});
+  }, (error, response, body) => {
+    if (error) {
+      return res.end(error)
+    }
 
-// Server Setup
+    res.render('routers', { routers: JSON.parse(body) })
+  })
+})
+
+app.get('/install-chute', (req, res, next) => {
+  var router_id = req.param('id')
+
+  request.post({
+    url: conf.provider.url + '/api/routers/' + router_id + '/updates',
+    headers: {
+      'Authorization': 'Bearer ' + req.user.accessToken,
+      'X-pd-extension': 'extension'
+    },
+    json: {
+      "updateClass": "CHUTE",
+      "updateType": "update",
+      "chute_id": "59034edfbf2e9ff97ba46135",
+      "version_id": "59034edfbf2e9ff97ba46136",
+      "config": {
+        "name": "hello-world",
+        "host_config": {
+          "port_bindings": {
+            "80": 8000
+          }
+        },
+        "dockerfile": '# hello-world # # Version 0.0.1 FROM nginx MAINTAINER Paradrop Team <info@paradrop.io> RUN echo ' +
+          '"Hello World from Paradrop!" > /usr/share/nginx/html/index.html',
+        "version": 1
+      }
+    }
+  }, (error, response, body) => {
+    if (error) {
+      console.log("ERROR", error)
+      return res.end("Error: ", error)
+    }
+
+    // console.log(updateType)
+    // console.log('Body: ', body)
+    // var resp = JSON.parse(body)
+    // console.log("Parsed: ", resp)
+
+    res.redirect(conf.provider.url + '/routers/' + router_id + '/updates/' + body._id)
+  })
+})
+
 // Retrieves the port from the configuration URL. Not clean, but this is not meant for production
 var split = conf.consumer.url.split(':')
 var port = split[split.length - 1]
 
-console.log("Demo consumer running at: ", conf.consumer.url);
-app.listen(port);
+// Start the server
+console.log("Demo consumer running at: ", conf.consumer.url)
+app.listen(port)

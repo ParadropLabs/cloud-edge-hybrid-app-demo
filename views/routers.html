@@ -1,3 +1,12 @@
 <h3>Routers from paradrop.org</h3>
 
-<p>{{routers}}</p>
+<p>Choose a router to install the 'Hello, World!' chute on.</p>
+
+<p>If successful, you will be redirected to the completed update page.</p>
+
+<ul class="people_list">
+  {{#each routers}}
+  <li>
+    <a href="/install-chute?id={{this._id}}">{{this.name}}</a></li>
+  {{/each}}
+</ul>
