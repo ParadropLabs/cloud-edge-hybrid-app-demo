@@ -4,6 +4,8 @@ var connect = require('connect'),
   request = require('request'),
   conf = require('./config'),
   path = require('path'),
+  handlebars = require('handlebars'),
+  exphbs = require('express-handlebars'),
   OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
 
 // Setup the app
@@ -16,6 +18,9 @@ var app = express()
   .use(connect.session({ secret: 'keyboard mouse' }))
   .use(passport.initialize())
   .use(passport.session());
+
+app.engine('html', exphbs({ extname: '.html' }));
+app.set('view engine', 'html');
 
 // Serializing a user object into the session
 passport.serializeUser(function(user, done) {
@@ -38,9 +43,7 @@ passport.use('exampleauth', new OAuth2Strategy({
 }));
 
 // Routing
-app.get('/', function(req, res, next) {
-  res.sendFile(path.resolve('public/index.html'));
-});
+
 
 app.get('/externalapi/account', function(req, res, next) {
   request({
@@ -58,9 +61,9 @@ app.get('/externalapi/account', function(req, res, next) {
 app.get('/auth/example-oauth2orize', passport.authenticate('exampleauth', { scope: ['list-routers'] }));
 app.get('/auth/example-oauth2orize/callback', passport.authenticate('exampleauth', { failureRedirect: '/close.html?error=foo' }));
 
-app.get('/auth/example-oauth2orize/callback', function(req, res) {
-  res.sendFile(path.resolve('public/success.html'));
-});
+app.get('/', function(req, res, next) { res.render('index'); });
+app.get('/template', function(req, res, next) { res.render('templ', { test: "hello!" }) });
+app.get('/auth/example-oauth2orize/callback', function(req, res) { res.render('success.html'); });
 
 // Server Setup
 // Retrieves the port from the configuration URL. Not clean, but this is not meant for production
