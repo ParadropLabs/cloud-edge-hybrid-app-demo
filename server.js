@@ -3,7 +3,6 @@ var connect = require('connect'),
   express = require('express'),
   request = require('request'),
   conf = require('./config'),
-  path = require('path'),
   handlebars = require('handlebars'),
   exphbs = require('express-handlebars'),
   OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
@@ -43,27 +42,33 @@ passport.use('exampleauth', new OAuth2Strategy({
 }));
 
 // Routing
+app.get('/', function(req, res, next) { res.render('index'); });
+app.get('/error', function(req, res, next) { res.render('error'); });
+app.get('/template', function(req, res, next) { res.render('templ', { test: "hello!" }) });
+app.get('/auth/example-oauth2orize/callback', function(req, res) { res.render('authed'); });
 
+app.get('/auth/example-oauth2orize', passport.authenticate('exampleauth', { scope: ['list-routers'] }));
+app.get('/auth/example-oauth2orize/callback', passport.authenticate('exampleauth', { failureRedirect: '/error?error=foo' }));
 
 app.get('/externalapi/account', function(req, res, next) {
+  console.log(req.user)
   request({
     url: conf.provider.url + '/api/routers',
     headers: { 'Authorization': 'Bearer ' + req.user.accessToken, 'X-pd-extension': 'extension' }
   }, function(error, response, body) {
+    console.log("Where the hell are we? ")
+
     if (!error && response.statusCode === 200) {
-      res.end(body);
+      // res.end(body);
+      console.log("BODY")
+      cosole.log("Body: ", body)
+      res.render('routers', { routers: body });
     } else {
+      console.log("body?")
       res.end('error: \n' + body);
     }
   });
 });
-
-app.get('/auth/example-oauth2orize', passport.authenticate('exampleauth', { scope: ['list-routers'] }));
-app.get('/auth/example-oauth2orize/callback', passport.authenticate('exampleauth', { failureRedirect: '/close.html?error=foo' }));
-
-app.get('/', function(req, res, next) { res.render('index'); });
-app.get('/template', function(req, res, next) { res.render('templ', { test: "hello!" }) });
-app.get('/auth/example-oauth2orize/callback', function(req, res) { res.render('success.html'); });
 
 // Server Setup
 // Retrieves the port from the configuration URL. Not clean, but this is not meant for production
