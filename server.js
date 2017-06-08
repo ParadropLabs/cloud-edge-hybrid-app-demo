@@ -1,5 +1,3 @@
-'use strict';
-
 var connect = require('connect'),
   passport = require('passport'),
   express = require('express'),
@@ -7,7 +5,6 @@ var connect = require('connect'),
   conf = require('./config'),
   path = require('path'),
   OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
-
 
 // Setup the app
 var app = express()
@@ -18,8 +15,7 @@ var app = express()
   .use(connect.cookieParser())
   .use(connect.session({ secret: 'keyboard mouse' }))
   .use(passport.initialize())
-  .use(passport.session())
-
+  .use(passport.session());
 
 // Serializing a user object into the session
 passport.serializeUser(function(user, done) {
@@ -47,7 +43,6 @@ app.get('/', function(req, res, next) {
 });
 
 app.get('/externalapi/account', function(req, res, next) {
-  console.log("Issuing request with token: ", req.user.accessToken)
   request({
     url: conf.provider.url + '/api/routers',
     headers: { 'Authorization': 'Bearer ' + req.user.accessToken, 'X-pd-extension': 'extension' }
@@ -67,14 +62,8 @@ app.get('/auth/example-oauth2orize/callback', function(req, res) {
   res.sendFile(path.resolve('public/success.html'));
 });
 
-// app.post('/auth/example-oauth2orize/callback', function(req, res /*, next*/ ) {
-//   console.log("Moved to passport?")
-//   console.log('req.user', req.user);
-//   res.end('thanks for playing');
-// });
-
 // Server Setup
-// Retrieve the port from the configuration URL. Not clean, but this is not meant for production
+// Retrieves the port from the configuration URL. Not clean, but this is not meant for production
 var split = conf.consumer.url.split(':')
 var port = split[split.length - 1]
 
