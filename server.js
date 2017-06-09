@@ -36,7 +36,7 @@ passport.use('exampleauth', new OAuth2Strategy({
 }))
 
 // Routing
-app.get('/auth/example-oauth2orize', passport.authenticate('exampleauth', { scope: ['list-routers'] }))
+app.get('/auth/example-oauth2orize', passport.authenticate('exampleauth', { scope: ['list-routers', 'install-chute'] }))
 app.get('/auth/example-oauth2orize/callback', passport.authenticate('exampleauth', { failureRedirect: '/error?error=foo' }))
 
 app.get('/', (req, res, next) => res.render('index'))
@@ -53,6 +53,10 @@ app.get('/choose-router', (req, res, next) => {
   }, (error, response, body) => {
     if (error) {
       return res.end(error)
+    }
+
+    if (response.statusCode !== 200) {
+      return res.end(response.body)
     }
 
     res.render('routers', { routers: JSON.parse(body) })
@@ -90,11 +94,6 @@ app.get('/install-chute', (req, res, next) => {
       console.log("ERROR", error)
       return res.end("Error: ", error)
     }
-
-    // console.log(updateType)
-    // console.log('Body: ', body)
-    // var resp = JSON.parse(body)
-    // console.log("Parsed: ", resp)
 
     res.redirect(conf.provider.url + '/routers/' + router_id + '/updates/' + body._id)
   })
