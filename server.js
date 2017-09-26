@@ -48,7 +48,7 @@ app.get('/choose-router', (req, res, next) => {
     url: conf.provider.url + '/api/routers',
     headers: {
       'Authorization': 'Bearer ' + req.user.accessToken,
-      'X-pd-extension': 'extension'
+      'x-pd-application': 'application'
     }
   }, (error, response, body) => {
     if (error) {
@@ -70,7 +70,7 @@ app.get('/install-chute', (req, res, next) => {
     url: conf.provider.url + '/api/routers/' + router_id + '/updates',
     headers: {
       'Authorization': 'Bearer ' + req.user.accessToken,
-      'X-pd-extension': 'extension'
+      'x-pd-application': 'application'
     },
     json: {
       "updateClass": "CHUTE",

@@ -1,11 +1,11 @@
 {
-  "name": "ward-steward",
+  "name": "hello-world",
   "version": "0.1.0",
-  "description": "A Tool for YSA wards to track home and visiting teaching",
+  "description": "A simple demo application to test 3rd party app support of paradrop",
   "main": "server.js",
   "repository": "",
-  "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.com)",
-  "license": "Apache2",
+  "author": "",
+  "license": "MIT",
   "dependencies": {
     "connect": "~2.12.0",
     "express": "^4.15.3",
