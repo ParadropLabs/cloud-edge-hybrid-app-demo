@@ -75,18 +75,15 @@ app.get('/install-chute', (req, res, next) => {
     json: {
       "updateClass": "CHUTE",
       "updateType": "update",
-      "chute_id": "59034edfbf2e9ff97ba46135",
-      "version_id": "59034edfbf2e9ff97ba46136",
+      "chute_id": "57e54dec8b2ebc6075a47aba",
+      "version_id": "589b872cbd890c561a79ab36",
       "config": {
-        "name": "hello-world",
-        "host_config": {
-          "port_bindings": {
-            "80": 8000
-          }
+        "web": {
+          "port":80
         },
-        "dockerfile": '# hello-world # # Version 0.0.1 FROM nginx MAINTAINER Paradrop Team <info@paradrop.io> RUN echo ' +
-          '"Hello World from Paradrop!" > /usr/share/nginx/html/index.html',
-        "version": 1
+        "dockerfile":"# hello-world\n#\n# Version 0.0.1\n\nFROM nginx\nMAINTAINER Paradrop Team <info@paradrop.io>\n\nRUN echo \"Hello World from Paradrop!\" > /usr/share/nginx/html/index.html",
+        "name":"app-demo",
+        "version":4
       }
     }
   }, (error, response, body) => {
