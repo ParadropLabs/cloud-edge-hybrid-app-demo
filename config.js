@@ -2,7 +2,7 @@
 
 module.exports = {
   provider: {
-    url: "https://www.paradrop.org",
+    url: "https://paradrop.org",
 
     // Useful for testing against a local instance of the paradrop server
     // url: "http://localhost:3000",
