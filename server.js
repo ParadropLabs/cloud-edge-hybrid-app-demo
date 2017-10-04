@@ -26,9 +26,12 @@ app.use(passport.session());
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
+const clientId = process.env.CLIENT_ID;
+const clientSecret = process.env.CLIENT_SECRET;
+
 passport.use('example-oauth2', new OAuth2Strategy({
-  clientID: conf.consumer.clientId,
-  clientSecret: conf.consumer.clientSecret,
+  clientID: clientId,
+  clientSecret: clientSecret,
   authorizationURL: conf.provider.url + conf.provider.authorizationRoute,
   tokenURL: conf.provider.url + conf.provider.tokenRoute,
   callbackURL: conf.consumer.url + "/auth/oauth2/callback"
@@ -73,7 +76,7 @@ app.get('/choose-router', (req, res, next) => {
 })
 
 app.get('/install-chute', (req, res, next) => {
-  var router_id = req.query.id;
+  const router_id = req.query.id;
 
   request.post({
     url: conf.provider.url + '/api/routers/' + router_id + '/updates',

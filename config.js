@@ -14,8 +14,6 @@ module.exports = {
   },
   consumer: {
     url: 'http://localhost:3004',
-    name: 'ParaDrop hybrid app demo',
-    clientId: '0iOwuc46s1g76zSDvxfJmfNL8GssTMnx',
-    clientSecret: 'epKQ1rg3FDaBkOLCbNOxNb5Mr4xd6BlY'
+    name: 'ParaDrop hybrid app demo'
   },
 };
