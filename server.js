@@ -73,7 +73,7 @@ app.get('/choose-router', (req, res, next) => {
 })
 
 app.get('/install-chute', (req, res, next) => {
-  var router_id = req.param('id');
+  var router_id = req.query.id;
 
   request.post({
     url: conf.provider.url + '/api/routers/' + router_id + '/updates',

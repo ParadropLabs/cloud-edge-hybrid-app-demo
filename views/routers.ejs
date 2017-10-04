@@ -6,10 +6,8 @@
 
 <ul class="router_list">
   <% for(var i=0; i<routers.length; i++) { %>
-      <li>
-          <a href='/install-chute?id=<%= routers[i] %>'>
-              <%= routers[i].name %>
-          </a>
-      </li>
+    <li>
+      <a href='/install-chute?id=<%= routers[i]._id %>'><%= routers[i].name %></a>
+    </li>
   <% } %>
 </ul>
