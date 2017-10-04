@@ -28,13 +28,14 @@ passport.deserializeUser((obj, done) => done(null, obj));
 
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
+const port = process.env.PORT || 3004;
 
 passport.use('example-oauth2', new OAuth2Strategy({
   clientID: clientId,
   clientSecret: clientSecret,
-  authorizationURL: conf.provider.url + conf.provider.authorizationRoute,
-  tokenURL: conf.provider.url + conf.provider.tokenRoute,
-  callbackURL: conf.consumer.url + "/auth/oauth2/callback"
+  authorizationURL: conf.oauth2.url + conf.oauth2.authorizationRoute,
+  tokenURL: conf.oauth2.url + conf.oauth2.tokenRoute,
+  callbackURL: conf.oauth2.callbackUrl
 }, (accessToken, refreshToken, profile, done) => {
   done(null, { accessToken: accessToken });
 }))
@@ -57,7 +58,7 @@ app.get('/error', (req, res, next) => res.render('error'));
 
 app.get('/choose-router', (req, res, next) => {
   request({
-    url: conf.provider.url + '/api/routers',
+    url: conf.oauth2.url + '/api/routers',
     headers: {
       'Authorization': 'Bearer ' + req.user.accessToken,
       'x-pd-application': 'application'
@@ -79,7 +80,7 @@ app.get('/install-chute', (req, res, next) => {
   const router_id = req.query.id;
 
   request.post({
-    url: conf.provider.url + '/api/routers/' + router_id + '/updates',
+    url: conf.oauth2.url + '/api/routers/' + router_id + '/updates',
     headers: {
       'Authorization': 'Bearer ' + req.user.accessToken,
       'x-pd-application': 'application'
@@ -104,15 +105,11 @@ app.get('/install-chute', (req, res, next) => {
       return res.end("Error: ", error);
     }
 
-    res.redirect(conf.provider.url + '/routers/' + router_id + '/updates/' + body._id);
+    res.redirect(conf.oauth2.url + '/routers/' + router_id + '/updates/' + body._id);
   });
 });
 
-// Retrieves the port from the configuration URL. Not clean, but this is not meant for production
-const split = conf.consumer.url.split(':');
-const port = split[split.length - 1];
-
 // Start the server
 app.listen(port, () => {
-  console.log("Demo consumer running at: ", conf.consumer.url);
+  console.log('Demo consumer running at port: ' + port);
 });
