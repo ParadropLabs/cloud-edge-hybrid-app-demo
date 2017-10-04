@@ -1,47 +1,56 @@
-var connect = require('connect'),
-  passport = require('passport'),
-  express = require('express'),
-  request = require('request'),
-  conf = require('./config'),
-  express_handlebars = require('express-handlebars'),
-  OAuth2Strategy = require('passport-oauth').OAuth2Strategy
+'use strict';
+
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const errorHandler = require('errorhandler');
+const session = require('express-session');
+const passport = require('passport');
+const OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
+const request = require('request');
+
+const conf = require('./config');
 
 // Setup the app
-var app = express()
-  .use(connect.query())
-  .use(connect.json())
-  .use(connect.urlencoded())
-  .use(connect.compress())
-  .use(connect.cookieParser())
-  .use(connect.session({ secret: 'keyboard mouse' }))
-  .use(passport.initialize())
-  .use(passport.session())
-
-// Use handlebars to template
-app.engine('html', express_handlebars({ extname: '.html' }))
-app.set('view engine', 'html')
+const app = express();
+app.set('view engine', 'ejs');
+app.use(cookieParser());
+app.use(bodyParser.json({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(errorHandler());
+app.use(session({ secret: 'random string', resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Serializing a user object into the session
-passport.serializeUser((user, done) => done(null, user))
-passport.deserializeUser((obj, done) => done(null, obj))
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((obj, done) => done(null, obj));
 
-passport.use('exampleauth', new OAuth2Strategy({
+passport.use('example-oauth2', new OAuth2Strategy({
   clientID: conf.consumer.clientId,
   clientSecret: conf.consumer.clientSecret,
-  authorizationURL: conf.provider.url + conf.provider.authorization_route,
-  tokenURL: conf.provider.url + conf.provider.token_route,
-  callbackURL: conf.consumer.url + "/auth/example-oauth2orize/callback"
+  authorizationURL: conf.provider.url + conf.provider.authorizationRoute,
+  tokenURL: conf.provider.url + conf.provider.tokenRoute,
+  callbackURL: conf.consumer.url + "/auth/oauth2/callback"
 }, (accessToken, refreshToken, profile, done) => {
-  done(null, { accessToken: accessToken })
+  done(null, { accessToken: accessToken });
 }))
 
 // Routing
-app.get('/auth/example-oauth2orize', passport.authenticate('exampleauth', { scope: ['list-routers', 'install-chute'] }))
-app.get('/auth/example-oauth2orize/callback', passport.authenticate('exampleauth', { failureRedirect: '/error?error=foo' }))
+app.get('/auth/oauth2',
+  passport.authenticate('example-oauth2', {
+    scope: ['list-routers', 'install-chute']
+  })
+);
+app.get('/auth/oauth2/callback',
+  passport.authenticate('example-oauth2', {
+    failureRedirect: '/error?error=foo'
+  })
+);
+app.get('/auth/oauth2/callback', (req, res) => res.render('authed'));
 
-app.get('/', (req, res, next) => res.render('index'))
-app.get('/error', (req, res, next) => res.render('error'))
-app.get('/auth/example-oauth2orize/callback', (req, res) => res.render('authed'))
+app.get('/', (req, res, next) => res.render('index'));
+app.get('/error', (req, res, next) => res.render('error'));
 
 app.get('/choose-router', (req, res, next) => {
   request({
@@ -52,19 +61,19 @@ app.get('/choose-router', (req, res, next) => {
     }
   }, (error, response, body) => {
     if (error) {
-      return res.end(error)
+      return res.end(error);
     }
 
     if (response.statusCode !== 200) {
-      return res.end(response.body)
+      return res.end(response.body);
     }
 
-    res.render('routers', { routers: JSON.parse(body) })
+    res.render('routers', { routers: JSON.parse(body) });
   })
 })
 
 app.get('/install-chute', (req, res, next) => {
-  var router_id = req.param('id')
+  var router_id = req.param('id');
 
   request.post({
     url: conf.provider.url + '/api/routers/' + router_id + '/updates',
@@ -88,18 +97,19 @@ app.get('/install-chute', (req, res, next) => {
     }
   }, (error, response, body) => {
     if (error) {
-      console.log("ERROR", error)
-      return res.end("Error: ", error)
+      console.log("ERROR", error);
+      return res.end("Error: ", error);
     }
 
-    res.redirect(conf.provider.url + '/routers/' + router_id + '/updates/' + body._id)
-  })
-})
+    res.redirect(conf.provider.url + '/routers/' + router_id + '/updates/' + body._id);
+  });
+});
 
 // Retrieves the port from the configuration URL. Not clean, but this is not meant for production
-var split = conf.consumer.url.split(':')
-var port = split[split.length - 1]
+const split = conf.consumer.url.split(':');
+const port = split[split.length - 1];
 
 // Start the server
-console.log("Demo consumer running at: ", conf.consumer.url)
-app.listen(port)
+app.listen(port, () => {
+  console.log("Demo consumer running at: ", conf.consumer.url);
+});
