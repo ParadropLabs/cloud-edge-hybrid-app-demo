@@ -1,4 +1,4 @@
-# Paradrop Application Example
+# Paradrop Hybrid Application Example
 
 This sample application demonstrates how to integrate a web application with paradrop.org through the OAuth2 support. With the ParaDrop integration, an application can "paradrop" services (chutes) into the extreme network edge --- the Wi-Fi routers.
 
