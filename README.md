@@ -6,7 +6,7 @@ The application is written with Node.js and express. It uses passport-oauth to i
 
 ## Setup
 
-Head over to [paradrop.org.](https://paradorp.org/) and register a new application.
+Head over to [paradrop.org.](https://paradrop.org/) and register a new application.
 
 Once you've created an application, drop on your client id and client secrete into `config.js` in this repo.
 
