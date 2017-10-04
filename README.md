@@ -41,4 +41,4 @@ On success, the user is sent to the third page. Here the user is presented with 
 
 This demo was created so that you, aspiring ParaDrop developer, could drop in the implementation into your own Node.js server and use ParaDrop's API as an OAuth2 client. The best way to understand how it's written is to check out the comments in `server.js`.
 
-You'll also need to view and understand how paradrop.org secures its endpoints through *Permissions*. You can find documentation on this information [here](https://paradrop.org/docs).
+You'll also need to view and understand how paradrop.org secures its endpoints through *Permissions*. You can find documentation on this information [here](http://paradrop.readthedocs.io/en/latest/).
