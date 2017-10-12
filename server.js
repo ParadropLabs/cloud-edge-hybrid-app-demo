@@ -21,6 +21,7 @@ app.use(errorHandler());
 app.use(session({ secret: 'random string', resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(express.static('public'));
 
 // Serializing a user object into the session
 passport.serializeUser((user, done) => done(null, user));
@@ -88,13 +89,11 @@ app.get('/install-chute', (req, res, next) => {
     json: {
       "updateClass": "CHUTE",
       "updateType": "update",
-      "chute_id": "57e54dec8b2ebc6075a47aba",
-      "version_id": "589b872cbd890c561a79ab36",
       "config": {
         "web": {
           "port":80
         },
-        "dockerfile":"# hello-world\n#\n# Version 0.0.1\n\nFROM nginx\nMAINTAINER Paradrop Team <info@paradrop.io>\n\nRUN echo \"Hello World from Paradrop!\" > /usr/share/nginx/html/index.html",
+        "dockerfile":"FROM nginx\nRUN echo \"Hello, World!\">/usr/share/nginx/html/index.html",
         "name":"app-demo",
         "version":4
       }

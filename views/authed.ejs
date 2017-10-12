@@ -1,5 +1,28 @@
-<h3>ParaDrop cloud edge hybrid application demo</h3>
-<p>You have given the permissions to the application.</p>
-<p>The application can access some resources in ParaDrop on behalf of you now.</p>
-<p>Click below link to get a list of all the routers you own.</p>
-<a href="/choose-router">GET: /api/routers</a>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include head.ejs %>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <h1>Success!</h1>
+
+          <p>You have granted us permission to list your ParaDrop routers and
+          install services on them.  Now we will collect information about the
+          routers that you own and let you choose one to install our
+          service.</p>
+
+          <p>Click the link below to get a list of ParaDrop routers that you
+          own.</p>
+
+          <a href="/choose-router">GET: /api/routers</a>
+        </div>
+      </div>
+    </div>
+
+    <%- include footer.ejs %>
+  </body>
+</html>

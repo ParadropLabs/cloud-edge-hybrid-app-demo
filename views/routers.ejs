@@ -1,13 +1,37 @@
-<h3>Routers from paradrop.org</h3>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include head.ejs %>
+  </head>
 
-<p>Choose a router to install the 'app-demo' chute on.</p>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <h1>Your ParaDrop Routers</h1>
+        </div>
+      </div>
 
-<p>If successful, you will be redirected to the completed update page.</p>
+      <div class="row">
+        <div class="col-lg-6">
+          <p>Choose a ParaDrop router from the list to install our service
+          as a chute called "app-demo".</p>
 
-<ul class="router_list">
-  <% for(var i=0; i<routers.length; i++) { %>
-    <li>
-      <a href='/install-chute?id=<%= routers[i]._id %>'><%= routers[i].name %></a>
-    </li>
-  <% } %>
-</ul>
+          <p>If successful, you will be redirected to a page with the status of
+          the installation process. Once the installation is complete, you will
+          be able to interact with the service running on your router.</p>
+
+        </div>
+        <div class="col-lg-6">
+          <div class="list-group">
+            <% for(var i=0; i<routers.length; i++) { %>
+            <a class="list-group-item list-group-item-action list-group-item-primary" href='/install-chute?id=<%= routers[i]._id %>'><%= routers[i].name %></a>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%- include footer.ejs %>
+  </body>
+</html>
