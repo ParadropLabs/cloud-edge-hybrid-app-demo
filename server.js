@@ -9,6 +9,7 @@ const passport = require('passport');
 const OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
 const request = require('request');
 
+const chuteConfig = require('./chute.json');
 const conf = require('./config');
 
 // Setup the app
@@ -89,14 +90,7 @@ app.get('/install-chute', (req, res, next) => {
     json: {
       "updateClass": "CHUTE",
       "updateType": "update",
-      "config": {
-        "web": {
-          "port":80
-        },
-        "dockerfile":"FROM nginx\nRUN echo \"Hello, World!\">/usr/share/nginx/html/index.html",
-        "name":"app-demo",
-        "version":4
-      }
+      "config": chuteConfig
     }
   }, (error, response, body) => {
     if (error) {
