@@ -1,8 +1,11 @@
 {
-  "web": {
-    "port": 80
+  "download": {
+    "checkout": "03f66baf62c86973f1a00da2d4ab68e106d28fad",
+    "url": "https://github.com/ParadropLabs/go-hello-world"
   },
-  "dockerfile": "FROM nginx\nRUN echo \"Hello, World!\">/usr/share/nginx/html/index.html",
-  "name": "app-demo",
-  "version": 4
+  "name": "go-hello-world",
+  "version": 1,
+  "web": {
+    "port": 8080
+  }
 }
